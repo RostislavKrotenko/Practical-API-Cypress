@@ -71,8 +71,39 @@ describe('Testing GRUD operations', () => {
                     headers: {'Authorization': 'Token ' + token},
                     method: 'DELETE'
                 })
-            })
-            
+            })  
         })   
+    })
+
+    it.only('Test PUT request', () => {
+
+        const newData ={
+            "user": {
+                "image": "",
+                "username": "Rostyslav",
+                "bio": "Test Automation",
+                "email": "rostik.krotenko@gmail.com",
+                "password": "apple123"
+            }
+        }
+
+        cy.get('@token').then( token => {
+            cy.request({
+                url: Cypress.env("apiURL") + '/api/user',
+                headers: {'Authorization': 'Token ' + token},
+                method: 'PUT',
+                body: newData
+            })
+
+            cy.request({
+                url: Cypress.env("apiURL")+'/api/profiles/'+newData.user.username,
+                headers: {'Authorization': 'Token ' + token},
+                method: 'GET'
+            }).then( response => {
+                expect(response.body.profile.username).to.equal('Rostyslav')
+                expect(response.body.profile.bio).to.equal('Test Automation')
+                expect(response.body.profile.image).to.equal('https://api.realworld.io/images/smiley-cyrus.jpeg')
+            })
+        })
     })
 })
